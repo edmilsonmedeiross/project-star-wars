@@ -16,5 +16,5 @@ export default function useFetch() {
     setData(residentsExcluded);
     setIsloading(false);
   };
-  return [data, makeFetch, isLoading];
+  return [data, makeFetch, isLoading, setData];
 }

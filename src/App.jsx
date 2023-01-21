@@ -1,11 +1,12 @@
 import './App.css';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Table from './components/Table';
 import PlanetContext from './components/context/PlanetsContext';
 import useFetch from './hooks/useFetch';
 
 function App() {
-  const [data, makeFetch, isLoading] = useFetch();
+  const [data, makeFetch, isLoading, setData] = useFetch();
+  const [nameFilter, setNameFilter] = useState('');
 
   useEffect(() => {
     const fetchPlanets = async () => {
@@ -16,12 +17,21 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const value = useMemo(() => ({ planets: data, isLoading }), [data, isLoading]);
+  const value = useMemo(() => ({ planets: data,
+    isLoading,
+    setData }), [data, isLoading, setData]);
 
   return (
     <PlanetContext.Provider value={ value }>
+      <input
+        type="text"
+        name="nameFilter"
+        data-testid="name-filter"
+        value={ nameFilter }
+        onChange={ (e) => { setNameFilter(e.target.value); } }
+      />
       <div>
-        <Table />
+        <Table nameFilter={ nameFilter } />
         <span>Hello, App!</span>
       </div>
     </PlanetContext.Provider>
