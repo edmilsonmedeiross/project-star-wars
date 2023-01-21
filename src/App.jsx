@@ -1,8 +1,10 @@
 import './App.css';
 import { useEffect, useMemo, useState } from 'react';
 import Table from './components/Table';
-import PlanetContext from './components/context/PlanetsContext';
 import useFetch from './hooks/useFetch';
+import PlanetContext from './context/PlanetsContext';
+import MultipleFilters from './components/MultipleFilters';
+import MultipleFiltersProvider from './context/MultipleFiltersProvider';
 
 function App() {
   const [data, makeFetch, isLoading, setData] = useFetch();
@@ -23,17 +25,20 @@ function App() {
 
   return (
     <PlanetContext.Provider value={ value }>
-      <input
-        type="text"
-        name="nameFilter"
-        data-testid="name-filter"
-        value={ nameFilter }
-        onChange={ (e) => { setNameFilter(e.target.value); } }
-      />
-      <div>
-        <Table nameFilter={ nameFilter } />
-        <span>Hello, App!</span>
-      </div>
+      <MultipleFiltersProvider>
+        <input
+          type="text"
+          name="nameFilter"
+          data-testid="name-filter"
+          value={ nameFilter }
+          onChange={ (e) => { setNameFilter(e.target.value); } }
+        />
+        <div>
+          <MultipleFilters />
+          <Table nameFilter={ nameFilter } />
+          <span>Hello, App!</span>
+        </div>
+      </MultipleFiltersProvider>
     </PlanetContext.Provider>
   );
 }
