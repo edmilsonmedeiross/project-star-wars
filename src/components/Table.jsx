@@ -4,14 +4,18 @@ import PlanetContext from '../context/PlanetsContext';
 import MultipleFiltersContext from '../context/MultipleFiltersContext';
 
 function Table({ nameFilter }) {
+  let filter = [];
   const { planets, isLoading } = useContext(PlanetContext);
-  const [filteredPlanets, setFilteredPlanets] = useState([]);
+  const [filteredPlanets, setFilteredPlanets] = useState(planets);
   const [renderFilter, setRenderFilter] = useState([]);
 
   const {
     headerValue,
     comparisonValue,
     numberFilter,
+    setSelectedFilter,
+    selectedFilter,
+    filterOptions,
   } = useContext(MultipleFiltersContext);
 
   useEffect(() => {
@@ -24,8 +28,6 @@ function Table({ nameFilter }) {
   if (isLoading || !planets || !filteredPlanets) {
     return <p>Carregando...</p>;
   }
-
-  let filter = planets;
 
   if (nameFilter) {
     filter = planets
@@ -47,8 +49,12 @@ function Table({ nameFilter }) {
       }
       return planet;
     });
-
+    console.log('handleClick');
+    console.log(comparisonValue);
+    console.log(headerValue);
+    filterOptions();
     setFilteredPlanets(newPlanets);
+    setSelectedFilter([...selectedFilter, headerValue]);
     setRenderFilter([...renderFilter,
       `${headerValue} ${comparisonValue} ${numberFilter}`]);
   };
