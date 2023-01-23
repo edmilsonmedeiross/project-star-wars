@@ -5,9 +5,12 @@ import MultipleFiltersContext from '../context/MultipleFiltersContext';
 
 function Table({ nameFilter }) {
   let filter = [];
+
   const { planets, isLoading } = useContext(PlanetContext);
-  const [filteredPlanets, setFilteredPlanets] = useState(planets);
+  const [filteredPlanets, setFilteredPlanets] = useState([]);
+  const [reFilterPlanets, setRefilterPlanets] = useState([]);
   const [renderFilter, setRenderFilter] = useState([]);
+  const [excludeFilter, setExcludeFilter] = useState([]);
 
   const {
     headerValue,
@@ -16,14 +19,25 @@ function Table({ nameFilter }) {
     setSelectedFilter,
     selectedFilter,
     filterOptions,
+    arrayOptions,
+    setArrayOptions,
   } = useContext(MultipleFiltersContext);
 
   useEffect(() => {
     const setPlanet = async () => {
-      setFilteredPlanets(planets);
+      await setFilteredPlanets(planets);
     };
     setPlanet();
   }, [planets]);
+
+  useEffect(() => {
+    if (renderFilter.length > 0) {
+      setFilteredPlanets(reFilterPlanets);
+    } else {
+      setFilteredPlanets(planets);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [excludeFilter]);
 
   if (isLoading || !planets || !filteredPlanets) {
     return <p>Carregando...</p>;
@@ -49,34 +63,68 @@ function Table({ nameFilter }) {
       }
       return planet;
     });
-    console.log('handleClick');
-    console.log(comparisonValue);
-    console.log(headerValue);
-    filterOptions();
+
     setFilteredPlanets(newPlanets);
     setSelectedFilter([...selectedFilter, headerValue]);
     setRenderFilter([...renderFilter,
       `${headerValue} ${comparisonValue} ${numberFilter}`]);
+    filterOptions();
+  };
+
+  const reFilter = async (e) => {
+    let tabu = '';
+
+    if (renderFilter.length > 0) {
+      tabu = renderFilter[0].split(' ');
+    } else {
+      tabu = '';
+    }
+
+    const refilterComparison = `${tabu[1]} ${tabu[2]}`;
+    const refilterColunm = `${tabu[0]}`;
+    const refilterNumeric = `${tabu[3]}`;
+
+    const newPlanets1 = planets.filter((planet) => {
+      if (refilterComparison === 'menor que') {
+        return +planet[refilterColunm] < +refilterNumeric;
+      }
+      if (refilterComparison === 'igual a') {
+        return +planet[refilterColunm] === +refilterNumeric;
+      }
+      if (refilterComparison === 'maior que') {
+        return +planet[refilterColunm] > +refilterNumeric;
+      }
+      return planet;
+    });
+
+    setRefilterPlanets(newPlanets1);
+    setExcludeFilter([...excludeFilter, e.target.name]);
+  };
+
+  const handleClickExclude = (e) => {
+    setArrayOptions([...arrayOptions, e.target.name]);
+    renderFilter.splice(e.target.id, 1);
+    setRenderFilter([...renderFilter]);
+    reFilter(e);
+  };
+
+  const removeAllFilters = () => {
+    setRenderFilter([]);
+    setExcludeFilter([]);
   };
 
   const headers = Object.keys(planets[0]);
 
-  /*  const removeFilter = ({ target }) => {
-    console.log('oioi');
-    console.log(target.id);
-    const removed = renderFilter.splice(target.id, 1);
-    // setRenderFilter(renderFilter.filter((el, index) => el[index] !== target.id));
-    setRenderFilter(removed);
-  }; */
-
   return (
     <div>
       {renderFilter.map((el, index) => (
-        <p key={ el + index }>
+        <p key={ el + index } data-testid="filter">
           {el}
           <button
             type="button"
             id={ index }
+            name={ renderFilter[index] }
+            onClick={ handleClickExclude }
           >
             excluir
           </button>
@@ -87,6 +135,12 @@ function Table({ nameFilter }) {
         onClick={ handleClick }
       >
         Filter
+      </button>
+      <button
+        data-testid="button-remove-filters"
+        onClick={ removeAllFilters }
+      >
+        REMOVER FILTROS
       </button>
       <table>
         <thead>

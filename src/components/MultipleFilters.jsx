@@ -24,39 +24,39 @@ function MultipleFilters() {
   );
 
   return (
-    <form>
-      <select
-        data-testid="column-filter"
-        value={ headerValue }
-        // selected={ headerValue }
-        onChange={ (e) => { setHeaderValue(e.target.value); } }
-      >
-        {
-          createOptions()
-        }
-
-      </select>
-      <select
-        data-testid="comparison-filter"
-        selected={ comparisonValue }
-        onChange={ (e) => { setComparisonValue(e.target.value); } }
-      >
-        { dataComparison.map((el, index) => (
-          <option
-            key={ el }
-            id={ index }
-            value={ el }
-          >
-            {el}
-          </option>)) }
-      </select>
-      <input
-        type="number"
-        data-testid="value-filter"
-        value={ numberFilter }
-        onChange={ (e) => { setNumberFilter(e.target.value); } }
-      />
-    </form>
+    <div>
+      <form>
+        <select
+          data-testid="column-filter"
+          value={ headerValue }
+          onChange={ (e) => { setHeaderValue(e.target.value); } }
+        >
+          {
+            createOptions()
+          }
+        </select>
+        <select
+          data-testid="comparison-filter"
+          selected={ comparisonValue }
+          onChange={ (e) => { setComparisonValue(e.target.value); } }
+        >
+          { dataComparison.map((el, index) => (
+            <option
+              key={ el }
+              id={ index }
+              value={ el }
+            >
+              {el}
+            </option>)) }
+        </select>
+        <input
+          type="number"
+          data-testid="value-filter"
+          value={ numberFilter }
+          onChange={ (e) => { setNumberFilter(e.target.value); } }
+        />
+      </form>
+    </div>
   );
 }
 

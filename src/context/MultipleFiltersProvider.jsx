@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import MultipleFiltersContext from './MultipleFiltersContext';
 
@@ -18,8 +18,11 @@ function MultipleFiltersProvider({ children }) {
       option !== headerValue
     ));
     setArrayOptions(filteredOptions);
-    setHeaderValue(arrayOptions[0]);
   };
+
+  useEffect(() => {
+    setHeaderValue(arrayOptions[0]);
+  }, [arrayOptions]);
 
   const values = useMemo(
     () => ({ headerValue,
