@@ -1,11 +1,12 @@
 import React, { useContext } from 'react';
 import MultipleFiltersContext from '../context/MultipleFiltersContext';
 
-export const createOptions = (paran) => paran.map(
+export const createOptions = (paran, id) => paran.map(
   (ele, index) => (
     <option
       key={ ele + index }
       value={ ele }
+      data-testid={ `${id}-${ele}` }
     >
       {ele}
     </option>),
@@ -32,7 +33,7 @@ function MultipleFilters() {
           onChange={ (e) => { setHeaderValue(e.target.value); } }
         >
           {
-            createOptions(arrayOptions)
+            createOptions(arrayOptions, 'option-name')
           }
         </select>
         <select

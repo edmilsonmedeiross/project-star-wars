@@ -169,6 +169,7 @@ function Table({ nameFilter }) {
         </p>))}
       <button
         type="button"
+        name="filter"
         data-testid="button-filter"
         onClick={ handleClick }
       >
