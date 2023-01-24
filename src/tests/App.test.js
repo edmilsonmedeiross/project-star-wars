@@ -126,26 +126,174 @@ describe("testes do App.JSX", () => {
     expect(namePlanets).toHaveLength(2);
   });
 
-  test("se ao filtrar por diameter maior que 9000, aparece o filtro na tela e 7 planetas", async () => {
+  test("se ao filtrar por diameter maior que 9000, aparece o filtro na tela e 7 planetas e exclui filtro", async () => {
     const columnFilter = screen.getByTestId("column-filter");
     const diameter = screen.getByTestId("option-name-diameter");
     const comparisonFilter = await screen.getByTestId("comparison-filter");
     const numberInput = screen.getByRole("spinbutton");
     const filterButton = await screen.findByRole("button", { name: /filter/i });
 
-    userEvent.click(columnFilter)
+    userEvent.click(columnFilter);
     userEvent.selectOptions(columnFilter, diameter);
-    expect(diameter).toBeTruthy()
-    userEvent.selectOptions(comparisonFilter, screen.getByRole('option', {name: 'maior que'}));
-    expect(screen.getByRole('option', {name: 'maior que'})).toBeTruthy()
-    userEvent.type(numberInput, '9000')
-    userEvent.click(filterButton)
+    expect(diameter).toBeTruthy();
+    userEvent.selectOptions(
+      comparisonFilter,
+      screen.getByRole("option", { name: "maior que" })
+    );
+    expect(screen.getByRole("option", { name: "maior que" })).toBeTruthy();
+    userEvent.type(numberInput, "9000");
+    userEvent.click(filterButton);
 
     // expect(await screen.findByRole(columnFilter, diameter).selected).toBe(true)
-    const filterDiameter = await screen.getByText(/diameter maior que 09000/i)
-    const namePlanets = await screen.findAllByTestId(/planet-name/)
+    const filterDiameter = await screen.getByText(/diameter maior que 09000/i);
+    const namePlanets = await screen.findAllByTestId(/planet-name/);
 
-    expect(filterDiameter).toBeInTheDocument()
-    expect(namePlanets).toHaveLength(7)
+    expect(filterDiameter).toBeInTheDocument();
+    expect(namePlanets).toHaveLength(7);
+
+    const excludeFilter = await screen.findByRole("button", {
+      name: /excluir/i,
+    });
+    userEvent.click(excludeFilter);
+    const newNamePlanets = await screen.findAllByTestId(/planet-name/);
+    //expect(filterDiameter).!toBeInTheDocument()
+    expect(newNamePlanets).toHaveLength(10);
+  });
+
+  test("se é possivel ordenar corretamente a tabela", async () => {
+    const asc = screen.getByRole("radio", { name: /asc/i });
+    const submit = await screen.findByRole("button", { name: /submit order/i });
+    const columnSort = screen.getByTestId("column-sort");
+    const optionRotation = screen.getByTestId("sort-rotation_period");
+
+    userEvent.selectOptions(columnSort, optionRotation);
+    expect(optionRotation).toBeTruthy();
+    userEvent.click(asc);
+    userEvent.click(submit);
+
+// Desc --------------------------------------------------------------------------
+
+    const desc = screen.getByText(/desc/i)
+    const descSubmit = await screen.findByRole("button", { name: /submit order/i });
+    const descColumnSort = screen.getByTestId("column-sort");
+    const descOptionRotation = screen.getByTestId("sort-rotation_period");
+
+    userEvent.selectOptions(descColumnSort, descOptionRotation);
+    expect(descOptionRotation).toBeTruthy();
+    userEvent.click(desc);
+    userEvent.click(descSubmit);
+  });
+  test("se é possivel remover todos os filtros", async () => {
+    
+
+    const columnFilter = screen.getByTestId("column-filter");
+    const diameter = screen.getByTestId("option-name-diameter");
+    const comparisonFilter = await screen.getByTestId("comparison-filter");
+    const numberInput = screen.getByRole("spinbutton");
+    const filterButton = await screen.findByRole("button", { name: /filter/i });
+
+    userEvent.click(columnFilter);
+    userEvent.selectOptions(columnFilter, diameter);
+    expect(diameter).toBeTruthy();
+    userEvent.selectOptions(
+      comparisonFilter,
+      screen.getByRole("option", { name: "maior que" })
+    );
+    expect(screen.getByRole("option", { name: "maior que" })).toBeTruthy();
+    userEvent.type(numberInput, "9000");
+    userEvent.click(filterButton);
+
+    // expect(await screen.findByRole(columnFilter, diameter).selected).toBe(true)
+    const filterDiameter = await screen.getByText(/diameter maior que 09000/i);
+    const namePlanets = await screen.findAllByTestId(/planet-name/);
+
+    expect(filterDiameter).toBeInTheDocument();
+    expect(namePlanets).toHaveLength(7);
+
+    const excludeFilter = await screen.findByRole("button", {
+      name: /excluir/i,
+    });
+
+    expect(excludeFilter).toBeInTheDocument()
+
+    // new filter menor que -----------------------------------------------------
+
+
+    const columnFilterMenor = screen.getByTestId("column-filter");
+    const populationMenor = screen.getByTestId("option-name-population");
+    const comparisonFilterMenor = await screen.getByTestId("comparison-filter");
+    const numberInputMenor = screen.getByRole("spinbutton");
+    const filterButtonMenor = await screen.findByRole("button", { name: /filter/i });
+
+    userEvent.click(columnFilterMenor);
+    userEvent.selectOptions(columnFilterMenor, populationMenor);
+    expect(populationMenor).toBeTruthy();
+    userEvent.selectOptions(
+      comparisonFilterMenor,
+      screen.getByRole("option", { name: "menor que" })
+    );
+    expect(screen.getByRole("option", { name: "menor que" })).toBeTruthy();
+    userEvent.clear(numberInputMenor)
+    userEvent.type(numberInputMenor, "1000000");
+    userEvent.click(filterButtonMenor);
+
+    // expect(await screen.findByRole(columnFilter, diameter).selected).toBe(true)
+    const filterPop = await screen.getByText(/population menor que 1000000/i);
+    const namePlanetsMenor = await screen.findAllByTestId(/planet-name/);
+
+    expect(filterPop).toBeInTheDocument();
+    expect(namePlanetsMenor).toHaveLength(2);
+
+    const excludeFilterMenor = await screen.findAllByRole("button", {
+      name: /excluir/i,
+    });
+
+    expect(excludeFilterMenor).toHaveLength(2)
+
+    // new filter
+
+    const newColumnFilter = screen.getByTestId("column-filter");
+    const rotationPeriod = screen.getByTestId("option-name-rotation_period");
+    const newComparisonFilter = await screen.getByTestId("comparison-filter");
+    const newNumberInput = screen.getByRole("spinbutton");
+    const newFilterButton = await screen.findByRole("button", { name: /filter/i });
+
+    userEvent.click(newColumnFilter);
+    userEvent.selectOptions(newColumnFilter, rotationPeriod);
+    expect(rotationPeriod).toBeTruthy();
+    userEvent.selectOptions(
+      newComparisonFilter,
+      screen.getByRole("option", { name: "igual a" })
+    );
+    expect(screen.getByRole("option", { name: "igual a" })).toBeTruthy();
+    userEvent.clear(newNumberInput)
+    userEvent.type(newNumberInput, '23');
+    userEvent.click(newFilterButton);
+
+    // expect(await screen.findByRole(columnFilter, diameter).selected).toBe(true)
+    const newFilterRotation = await screen.getByText(/rotation_period igual a 23/i);
+    const newNamePlanets = await screen.findAllByTestId(/planet-name/);
+
+    expect(newFilterRotation).toBeInTheDocument();
+    expect(newNamePlanets).toHaveLength(1);
+
+    const newExcludeFilter = await screen.findAllByRole("button", {
+      name: /excluir/i,
+    });
+
+    expect(newExcludeFilter).toHaveLength(3)
+    const newNamePlanetsss = await screen.findAllByTestId(/planet-name/);
+    expect(newNamePlanetsss).toHaveLength(1)
+
+    const removeAllFiltersButton = await screen.findByRole("button", {
+      name: /remover filtros/i,
+    });
+
+    userEvent.click(removeAllFiltersButton)
+
+    const newNamePlanetss = await screen.findAllByTestId(/planet-name/);
+    //expect(filterDiameter).!toBeInTheDocument()
+    expect(newNamePlanetss).toHaveLength(10);
+    
   });
 });

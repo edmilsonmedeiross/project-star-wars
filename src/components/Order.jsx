@@ -21,7 +21,7 @@ export default function Order() {
           );
         } }
       >
-        { createOptions(dataOptionsOrder) }
+        { createOptions(dataOptionsOrder, 'sort') }
       </select>
       <label htmlFor="asc">
         <input
