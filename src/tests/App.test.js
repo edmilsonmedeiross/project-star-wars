@@ -1,8 +1,9 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, cleanup } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import App from "../App";
 import testData from "../../cypress/mocks/testData";
+import { act } from 'react-dom/test-utils';
 
 const spyFetch = jest.spyOn(global, "fetch");
 
@@ -12,6 +13,11 @@ describe("testes do App.JSX", () => {
       json: jest.fn().mockResolvedValue(testData),
     });
     render(<App />);
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    cleanup();
   });
 
   test("se os inputs e buttons estão presentes", async () => {
@@ -160,8 +166,58 @@ describe("testes do App.JSX", () => {
     expect(newNamePlanets).toHaveLength(10);
   });
 
+  // teste pegar 100%
+
+  test('teste', async() => {
+    const buttonFilter = await screen.findByTestId('button-filter');
+    const valueFilter = screen.getByTestId('value-filter');
+
+    await waitFor(() => expect(screen.getAllByTestId('planet-name')[0]).toHaveTextContent('Tatooine'));
+
+    act(() => {
+      fireEvent.change(valueFilter, { target: { value: '200000' } })
+      fireEvent.click(buttonFilter);
+    });
+
+    expect(screen.getAllByTestId('planet-name')[0]).toHaveTextContent('Alderaan');
+
+    const filterList = screen.getByTestId('filter');
+    expect(filterList).toBeInTheDocument();
+
+   /*  act(async () => {
+      const filterRemove = await screen.findByTestId('remove-filter');
+      fireEvent.click(filterRemove);
+    }); */
+    // const filterListr = await screen.findByTestId('filter');
+    // expect(filterListr).not.toBeInTheDocument();
+
+    const comparisonFilter = screen.getByTestId('comparison-filter');
+    act(() => {
+      userEvent.selectOptions(comparisonFilter, 'menor que');
+      fireEvent.change(valueFilter, { target: { value: '364' } })
+      fireEvent.click(buttonFilter);
+    });
+    const cont = await screen.findAllByTestId('planet-name')
+    expect(cont[0]).toHaveTextContent('Naboo');
+
+   /*  act(async () => {
+      const filterRemove = await screen.findByTestId('remove-filter');
+      fireEvent.click(filterRemove);  
+    }); */
+
+    act(() => {
+      userEvent.selectOptions(comparisonFilter, 'igual a');
+      fireEvent.change(valueFilter, { target: { value: '1000' } })
+      fireEvent.click(buttonFilter);      
+    });
+/* const tatoo = await screen.findAllByTestId('planet-name')
+    expect(tatoo[0]).toHaveTextContent('Naboo'); */
+  }); 
+
+  // finaly
+
   test("se é possivel ordenar corretamente a tabela", async () => {
-    const asc = screen.getByRole("radio", { name: /asc/i });
+    const asc = await screen.findByRole("radio", { name: /asc/i });
     const submit = await screen.findByRole("button", { name: /submit order/i });
     const columnSort = screen.getByTestId("column-sort");
     const optionRotation = screen.getByTestId("sort-rotation_period");
@@ -183,11 +239,39 @@ describe("testes do App.JSX", () => {
     userEvent.click(desc);
     userEvent.click(descSubmit);
   });
+
+
+  // test pegar 100%
+
+  test('Testa botão de ordenar', async () => {
+    await waitFor(() => expect(screen.getAllByTestId('planet-name')[0]).toHaveTextContent('Tatooine'));
+    const asc = await screen.findByRole("radio", { name: /asc/i });
+    act(() => {
+      fireEvent.click(asc);
+    });
+
+    const submitOrder = await screen.findByRole('button', {  name: /submit order/i})
+    act(() => {
+      fireEvent.click(submitOrder);
+    });
+    expect(screen.getAllByTestId('planet-name')[0]).toHaveTextContent('Yavin IV');
+
+    const buttonDesc = screen.getByTestId('column-sort-input-desc');
+    act(() => {
+      fireEvent.click(buttonDesc);
+      fireEvent.click(submitOrder);
+    });
+    expect(screen.getAllByTestId('planet-name')[0]).toHaveTextContent('Coruscant');
+  });
+
+  // finaly
+
+
   test("se é possivel remover todos os filtros", async () => {
     
 
-    const columnFilter = screen.getByTestId("column-filter");
     const diameter = screen.getByTestId("option-name-diameter");
+    const columnFilter = await screen.findByTestId("column-filter");
     const comparisonFilter = await screen.getByTestId("comparison-filter");
     const numberInput = screen.getByRole("spinbutton");
     const filterButton = await screen.findByRole("button", { name: /filter/i });
