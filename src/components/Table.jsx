@@ -21,6 +21,9 @@ function Table({ nameFilter }) {
     filterOptions,
     arrayOptions,
     setArrayOptions,
+    startOrder,
+    setStartOrder,
+    orderTable,
   } = useContext(MultipleFiltersContext);
 
   useEffect(() => {
@@ -38,6 +41,11 @@ function Table({ nameFilter }) {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [excludeFilter]);
+
+  useEffect(() => {
+    setFilteredPlanets(filteredPlanets);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startOrder]);
 
   if (isLoading || !planets || !filteredPlanets) {
     return <p>Carregando...</p>;
@@ -113,6 +121,36 @@ function Table({ nameFilter }) {
     setExcludeFilter([]);
   };
 
+  const handleOrder = (data, { order: { column, sort } }) => {
+    if (sort === 'ASC') {
+      const ascOrdened = data.reduce((acc, cur) => {
+        if (cur[column] === 'unknown') {
+          acc.push(cur);
+        } else {
+          const index = acc.findIndex((value) => value[column] === 'unknown');
+          acc.splice(index, 0, cur);
+        }
+        return acc;
+      }, []).sort((a, b) => a[column] - b[column]);
+
+      setStartOrder(!startOrder);
+      return setFilteredPlanets(ascOrdened);
+    }
+
+    const descOrdened = data.reduce((acc, cur) => {
+      if (cur[column] === 'unknown') {
+        acc.push(cur);
+      } else {
+        const index = acc.findIndex((value) => value[column] === 'unknown');
+        acc.splice(index, 0, cur);
+      }
+      return acc;
+    }, []).sort((a, b) => b[column] - a[column]);
+
+    setStartOrder(!startOrder);
+    return setFilteredPlanets(descOrdened);
+  };
+
   const headers = Object.keys(planets[0]);
 
   return (
@@ -142,6 +180,12 @@ function Table({ nameFilter }) {
       >
         REMOVER FILTROS
       </button>
+      <button
+        data-testid="column-sort-button"
+        onClick={ () => { handleOrder(filteredPlanets, orderTable); } }
+      >
+        Submit Order
+      </button>
       <table>
         <thead>
           <tr>
@@ -152,7 +196,14 @@ function Table({ nameFilter }) {
           {filter.map((ele) => (
             <tr key={ ele.name }>
               {Object.values(ele)
-                .map((atr) => <td key={ atr }>{atr}</td>)}
+                .map((atr) => (
+                  <td
+                    key={ atr }
+                    data-testid={ ele.name === atr
+                      ? 'planet-name' : '' }
+                  >
+                    {atr}
+                  </td>))}
             </tr>))}
         </tbody>
       </table>

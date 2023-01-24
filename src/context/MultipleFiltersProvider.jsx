@@ -12,6 +12,9 @@ function MultipleFiltersProvider({ children }) {
   const [filterButton, setFilterButton] = useState('');
   const [selectedFilter, setSelectedFilter] = useState([]);
   const [arrayOptions, setArrayOptions] = useState(dataOptions);
+  const [startOrder, setStartOrder] = useState(false);
+  const [orderTable, setOrderTable] = useState({ order:
+     { column: 'population', sort: 'ASC' } });
 
   const filterOptions = () => {
     const filteredOptions = arrayOptions.filter((option) => (
@@ -31,16 +34,20 @@ function MultipleFiltersProvider({ children }) {
       selectedFilter,
       arrayOptions,
       filterButton,
+      orderTable,
+      startOrder,
       setSelectedFilter,
+      setStartOrder,
       setArrayOptions,
       setHeaderValue,
       setComparisonValue,
       setNumberFilter,
       filterOptions,
-      setFilterButton }),
+      setFilterButton,
+      setOrderTable }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [headerValue, arrayOptions, comparisonValue,
-      numberFilter, filterButton, selectedFilter],
+    [headerValue, arrayOptions, comparisonValue, startOrder,
+      numberFilter, filterButton, selectedFilter, orderTable],
   );
 
   return (

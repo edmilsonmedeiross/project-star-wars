@@ -5,6 +5,7 @@ import useFetch from './hooks/useFetch';
 import PlanetContext from './context/PlanetsContext';
 import MultipleFilters from './components/MultipleFilters';
 import MultipleFiltersProvider from './context/MultipleFiltersProvider';
+import Order from './components/Order';
 
 function App() {
   const [data, makeFetch, isLoading, setData] = useFetch();
@@ -35,6 +36,7 @@ function App() {
         />
         <div>
           <MultipleFilters />
+          <Order />
           <Table nameFilter={ nameFilter } />
           <span>Hello, App!</span>
         </div>

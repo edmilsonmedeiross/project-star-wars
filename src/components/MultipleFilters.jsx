@@ -1,6 +1,16 @@
 import React, { useContext } from 'react';
 import MultipleFiltersContext from '../context/MultipleFiltersContext';
 
+export const createOptions = (paran) => paran.map(
+  (ele, index) => (
+    <option
+      key={ ele + index }
+      value={ ele }
+    >
+      {ele}
+    </option>),
+);
+
 function MultipleFilters() {
   const dataComparison = ['maior que', 'menor que', 'igual a'];
 
@@ -13,16 +23,6 @@ function MultipleFilters() {
     arrayOptions,
   } = useContext(MultipleFiltersContext);
 
-  const createOptions = () => arrayOptions.map(
-    (ele, index) => (
-      <option
-        key={ ele + index }
-        value={ ele }
-      >
-        {ele}
-      </option>),
-  );
-
   return (
     <div>
       <form>
@@ -32,7 +32,7 @@ function MultipleFilters() {
           onChange={ (e) => { setHeaderValue(e.target.value); } }
         >
           {
-            createOptions()
+            createOptions(arrayOptions)
           }
         </select>
         <select
