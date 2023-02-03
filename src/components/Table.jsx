@@ -163,6 +163,7 @@ function Table({ nameFilter }) {
             id={ index }
             name={ renderFilter[index] }
             onClick={ handleClickExclude }
+            data-testid="filter-remove"
           >
             excluir
           </button>
